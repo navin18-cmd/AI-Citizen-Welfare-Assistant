@@ -16,3 +16,7 @@ backend/uploads/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Temp editor artifacts
+tmpclaude-*
+**/tmpclaude-*
