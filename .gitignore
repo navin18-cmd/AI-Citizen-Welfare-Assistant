@@ -1,0 +1,18 @@
+# Python
+.venv/
+**/__pycache__/
+*.pyc
+
+# Node / Next
+**/node_modules/
+frontend/.next/
+out/
+
+# Local data
+backend/uploads/
+*.db
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+.vscode/

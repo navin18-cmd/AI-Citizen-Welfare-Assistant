@@ -1,0 +1,150 @@
+[
+  {
+    "id": 1,
+    "name": "Ayushman Bharat - PM Jan Arogya Yojana",
+    "short_name": "Ayushman Bharat",
+    "category": "Healthcare",
+    "benefit_value": 500000,
+    "benefit_description": "Health insurance cover of ₹5,00,000 per family per year for secondary and tertiary hospitalisation",
+    "eligibility": {
+      "max_income": 100000,
+      "occupations": ["construction worker", "domestic worker", "farmer", "daily wage worker", "street vendor", "rag picker", "vegetable seller", "auto driver", "sanitation worker"],
+      "min_age": 0,
+      "max_age": 100,
+      "states": ["all"]
+    },
+    "required_documents": ["Aadhaar Card", "Ration Card", "Income Certificate"],
+    "apply_link": "https://pmjay.gov.in",
+    "hindi_name": "आयुष्मान भारत - पीएम जन आरोग्य योजना",
+    "tamil_name": "ஆயுஷ்மான் பாரத் - பிஎம் ஜன் ஆரோக்கிய திட்டம்",
+    "description": "World's largest government-funded health insurance program covering over 10 crore poor families.",
+    "icon": "🏥"
+  },
+  {
+    "id": 2,
+    "name": "e-Shram Card Registration",
+    "short_name": "e-Shram",
+    "category": "Labour",
+    "benefit_value": 200000,
+    "benefit_description": "Accidental insurance of ₹2,00,000 + access to social security schemes for unorganised workers",
+    "eligibility": {
+      "max_income": 150000,
+      "occupations": ["construction worker", "domestic worker", "daily wage worker", "street vendor", "rag picker", "vegetable seller", "auto driver", "sanitation worker", "migrant worker"],
+      "min_age": 16,
+      "max_age": 59,
+      "states": ["all"]
+    },
+    "required_documents": ["Aadhaar Card", "Bank Account Details", "Mobile Number linked to Aadhaar"],
+    "apply_link": "https://eshram.gov.in",
+    "hindi_name": "ई-श्रम कार्ड पंजीकरण",
+    "tamil_name": "இ-ஷ்ரம் அட்டை பதிவு",
+    "description": "National database for unorganised workers providing them identity and social security benefits.",
+    "icon": "👷"
+  },
+  {
+    "id": 3,
+    "name": "PM Shram Yogi Mandhan Yojana",
+    "short_name": "PM-SYM",
+    "category": "Pension",
+    "benefit_value": 36000,
+    "benefit_description": "Monthly pension of ₹3,000 after age 60 for unorganised sector workers",
+    "eligibility": {
+      "max_income": 180000,
+      "occupations": ["construction worker", "domestic worker", "daily wage worker", "street vendor", "rag picker", "vegetable seller", "auto driver", "sanitation worker"],
+      "min_age": 18,
+      "max_age": 40,
+      "states": ["all"]
+    },
+    "required_documents": ["Aadhaar Card", "Savings Bank Account", "Mobile Number"],
+    "apply_link": "https://maandhan.in",
+    "hindi_name": "प्रधानमंत्री श्रम योगी मानधन योजना",
+    "tamil_name": "பிரதம மந்திரி ஷ்ரம் யோகி மான்தன் திட்டம்",
+    "description": "Voluntary pension scheme for unorganised workers ensuring old age security with monthly pension.",
+    "icon": "🏦"
+  },
+  {
+    "id": 4,
+    "name": "PM Awas Yojana - Gramin",
+    "short_name": "PMAY-G",
+    "category": "Housing",
+    "benefit_value": 120000,
+    "benefit_description": "Financial assistance of ₹1,20,000 for construction of pucca house in plain areas",
+    "eligibility": {
+      "max_income": 100000,
+      "occupations": ["construction worker", "domestic worker", "farmer", "daily wage worker", "landless labourer"],
+      "min_age": 18,
+      "max_age": 100,
+      "states": ["all"]
+    },
+    "required_documents": ["Aadhaar Card", "BPL Certificate", "Land Documents", "Bank Account"],
+    "apply_link": "https://pmayg.nic.in",
+    "hindi_name": "प्रधानमंत्री आवास योजना - ग्रामीण",
+    "tamil_name": "பிரதம மந்திரி ஆவாஸ் யோஜனா - கிராமீண்",
+    "description": "Housing for all scheme providing financial assistance to rural poor for constructing pucca houses.",
+    "icon": "🏠"
+  },
+  {
+    "id": 5,
+    "name": "PM Kisan Samman Nidhi",
+    "short_name": "PM Kisan",
+    "category": "Agriculture",
+    "benefit_value": 6000,
+    "benefit_description": "Income support of ₹6,000 per year paid in 3 instalments of ₹2,000 directly to farmers",
+    "eligibility": {
+      "max_income": 200000,
+      "occupations": ["farmer", "small farmer", "marginal farmer"],
+      "min_age": 18,
+      "max_age": 100,
+      "states": ["all"]
+    },
+    "required_documents": ["Aadhaar Card", "Land Records", "Bank Account"],
+    "apply_link": "https://pmkisan.gov.in",
+    "hindi_name": "प्रधानमंत्री किसान सम्मान निधि",
+    "tamil_name": "பிரதம மந்திரி கிசான் சம்மான் நிதி",
+    "description": "Income support scheme for small and marginal farmers across India with direct bank transfer.",
+    "icon": "🌾"
+  },
+  {
+    "id": 6,
+    "name": "Pradhan Mantri Ujjwala Yojana",
+    "short_name": "PMUY",
+    "category": "Fuel",
+    "benefit_value": 1600,
+    "benefit_description": "Free LPG connection with ₹1,600 assistance for BPL households",
+    "eligibility": {
+      "max_income": 100000,
+      "occupations": ["construction worker", "domestic worker", "farmer", "daily wage worker", "all"],
+      "min_age": 18,
+      "max_age": 100,
+      "states": ["all"],
+      "gender": "female"
+    },
+    "required_documents": ["Aadhaar Card", "BPL Ration Card", "Bank Account"],
+    "apply_link": "https://pmuy.gov.in",
+    "hindi_name": "प्रधानमंत्री उज्ज्वला योजना",
+    "tamil_name": "பிரதம மந்திரி உஜ்வலா யோஜனா",
+    "description": "Free LPG connections to women from BPL households for clean cooking fuel.",
+    "icon": "🔥"
+  },
+  {
+    "id": 7,
+    "name": "Mahatma Gandhi NREGA",
+    "short_name": "MGNREGS",
+    "category": "Employment",
+    "benefit_value": 73000,
+    "benefit_description": "Guaranteed 100 days of wage employment per year at minimum wage (₹202-330/day)",
+    "eligibility": {
+      "max_income": 150000,
+      "occupations": ["daily wage worker", "construction worker", "farmer", "landless labourer", "domestic worker"],
+      "min_age": 18,
+      "max_age": 100,
+      "states": ["all"]
+    },
+    "required_documents": ["Aadhaar Card", "Job Card", "Bank Account"],
+    "apply_link": "https://nrega.nic.in",
+    "hindi_name": "महात्मा गांधी राष्ट्रीय ग्रामीण रोजगार गारंटी अधिनियम",
+    "tamil_name": "மகாத்மா காந்தி தேசிய கிராமப்புற வேலைவாய்ப்பு உத்தரவாத திட்டம்",
+    "description": "Employment guarantee scheme providing 100 days of work to rural households.",
+    "icon": "⚒️"
+  }
+]
