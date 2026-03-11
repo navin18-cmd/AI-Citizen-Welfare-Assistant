@@ -165,3 +165,9 @@ User speaks / uploads doc
 | OCR (mock) | Pillow (placeholder for Tesseract) |
 | Speech (mock) | Placeholder for OpenAI Whisper |
 | Translation | Static string map (placeholder for Google Translate API) |
+
+## To start the web
+Backend:cd "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\backend"
+& "C:\Users\NAVIN GS\OneDrive\project\public welfare demo\.venv\Scripts\python.exe" -m uvicorn main:app --reload
+Frontend:cd "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\frontend"
+npm.cmd run dev
