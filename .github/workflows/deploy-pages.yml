@@ -27,23 +27,26 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: ai-welfare-assistant/frontend/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        working-directory: ai-welfare-assistant/frontend
+        working-directory: frontend
         run: npm ci
 
       - name: Build static site
-        working-directory: ai-welfare-assistant/frontend
+        working-directory: frontend
         run: npm run build
 
       - name: Add SPA fallback
-        run: cp ai-welfare-assistant/frontend/out/index.html ai-welfare-assistant/frontend/out/404.html
+        run: cp frontend/out/index.html frontend/out/404.html
+
+      - name: Disable Jekyll processing
+        run: touch frontend/out/.nojekyll
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ai-welfare-assistant/frontend/out
+          path: frontend/out
 
   deploy:
     environment:
