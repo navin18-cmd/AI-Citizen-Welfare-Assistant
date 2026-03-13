@@ -135,7 +135,7 @@ User speaks / uploads doc
 ## Recent UI Updates
 
 - Homepage CTA buttons clarified to: `🎤 Speak Your Details`, `📄 Upload Aadhaar`, `🔍 Find Eligible Schemes`.
-- Added AI branding line under the homepage title: `Powered by AI: Speech Recognition • OCR • Eligibility Engine`.
+- Updated homepage hero line under the title to: `Discover. Register. Receive — find every government scheme you qualify for, free, instantly.`
 - Added impact statement on homepage hero: `Helping 500M+ informal workers discover government welfare schemes instantly.`
 - Added footer note on homepage: `Demo Mode — using simulated welfare scheme data.`
 - No backend/API behavior changes and no new dependencies required.

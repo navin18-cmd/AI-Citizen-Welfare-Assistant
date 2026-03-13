@@ -3,7 +3,7 @@
 const PROJECTIONS = [
   {
     icon: '👤',
-    label: '1 Worker',
+    label: '1 Citizen',
     workers: 1,
     benefit: 856000,
     display: '₹8,56,000',
@@ -13,7 +13,7 @@ const PROJECTIONS = [
   },
   {
     icon: '👥',
-    label: '1,000 Workers',
+    label: '1,000 Citizens',
     workers: 1000,
     benefit: 856000000,
     display: '₹85,60,00,000',
@@ -23,7 +23,7 @@ const PROJECTIONS = [
   },
   {
     icon: '🌍',
-    label: '10 Lakh Workers',
+    label: '10 Lakh Citizens',
     workers: 1000000,
     benefit: 856000000000,
     display: '₹8,560 Crore',
@@ -47,10 +47,10 @@ export default function ImpactCalculator({ language = 'en' }: Props) {
 
   const subtitle =
     language === 'hi'
-      ? 'यदि यह AI प्लेटफॉर्म लाखों श्रमिकों को कल्याण योजनाओं तक पहुँचने में मदद करे, तो सामाजिक प्रभाव अपार हो सकता है।'
+      ? 'यदि यह AI प्लेटफॉर्म लाखों नागरिकों को कल्याण योजनाओं तक पहुँचने में मदद करे, तो सामाजिक प्रभाव अपार हो सकता है।'
       : language === 'ta'
-      ? 'இந்த AI தளம் மில்லியன் கணக்கான தொழிலாளர்களுக்கு நலத் திட்டங்களை அணுக உதவினால், சமூக தாக்கம் மிகப்பெரியதாக இருக்கும்.'
-      : 'If this AI platform helps millions of workers access welfare schemes, the social impact can be enormous.'
+      ? 'இந்த AI தளம் மில்லியன் கணக்கான குடிமக்களுக்கு நலத் திட்டங்களை அணுக உதவினால், சமூக தாக்கம் மிகப்பெரியதாக இருக்கும்.'
+      : 'If this AI platform helps millions of citizens access welfare schemes, the social impact can be enormous.'
 
   const benefitLabel =
     language === 'hi' ? 'लाभ राशि' : language === 'ta' ? 'நலன் மதிப்பு' : 'Benefits Unlocked'
@@ -81,7 +81,7 @@ export default function ImpactCalculator({ language = 'en' }: Props) {
 
       {/* Bottom note */}
       <p className="text-center text-xs text-gray-400 mt-4">
-        * Based on average ₹8,56,000 benefit per worker across 7 government schemes.
+        * Based on average ₹8,56,000 benefit per citizen across 7 government schemes.
       </p>
     </div>
   )

@@ -9,8 +9,8 @@ const LANG_TEXT: Record<string, any> = {
   en: {
     title: 'AI Citizen Welfare Assistant',
     subtitle: 'Discover government schemes you qualify for — instantly',
-    aiLabel: 'Powered by AI: Speech Recognition • OCR • Eligibility Engine',
-    impact: 'Helping 500M+ informal workers discover government welfare schemes instantly.',
+    aiLabel: 'Discover. Register. Receive — find every government scheme you qualify for, free, instantly.',
+    impact: '1.4B Indians Deserve Welfare Access\n1000+ Government Schemes Exist\nYet 70% Never Claim Their Benefits\nNo Free AI Tool Helps Them Discover Schemes Instantly.',
     speak: '🎤 Speak Your Details',
     upload: '📄 Upload Aadhaar',
     find: '🔍 Find Eligible Schemes',
@@ -27,8 +27,8 @@ const LANG_TEXT: Record<string, any> = {
   hi: {
     title: 'AI नागरिक कल्याण सहायक',
     subtitle: 'तुरंत जानें — किन सरकारी योजनाओं के आप पात्र हैं',
-    aiLabel: 'AI संचालित: स्पीच रिकग्निशन • OCR • एलिजिबिलिटी इंजन',
-    impact: '500M+ असंगठित श्रमिकों को सरकारी योजनाएं तुरंत खोजने में मदद।',
+    aiLabel: 'खोजें. पंजीकरण करें. प्राप्त करें — हर सरकारी योजना जानें जिसके लिए आप पात्र हैं, मुफ्त और तुरंत।',
+    impact: '1.4B भारतीयों को कल्याण लाभ तक पहुंच मिलनी चाहिए\n1000+ सरकारी योजनाएं मौजूद हैं\nफिर भी 70% लोग अपने लाभ का दावा नहीं करते\nउन्हें योजनाएं तुरंत खोजने में मदद करने वाला कोई मुफ्त AI टूल नहीं है।',
     speak: '🎤  बोलें',
     upload: '📄  दस्तावेज़ अपलोड करें',
     find: '🔍  योजनाएं खोजें',
@@ -45,8 +45,8 @@ const LANG_TEXT: Record<string, any> = {
   ta: {
     title: 'AI குடிமக்கள் நல உதவியாளர்',
     subtitle: 'நீங்கள் தகுதிபெறும் அரசு திட்டங்களை உடனே கண்டறியுங்கள்',
-    aiLabel: 'AI மூலம் இயங்குகிறது: பேச்சு அடையாளம் • OCR • தகுதி இயந்திரம்',
-    impact: '500M+ ஒழுங்கற்ற தொழிலாளர்கள் அரசு நலத் திட்டங்களை உடனே கண்டறிய உதவுகிறது.',
+    aiLabel: 'தேடுங்கள். பதிவு செய்யுங்கள். பெறுங்கள் — நீங்கள் தகுதியான அனைத்து அரசு திட்டங்களையும் இலவசமாக, உடனடியாக கண்டறியுங்கள்.',
+    impact: '1.4B இந்தியர்களுக்கு நலத்திட்ட அணுகல் கிடைக்க வேண்டும்\n1000+ அரசு திட்டங்கள் உள்ளன\nஇருப்பினும் 70% பேர் தங்களுக்கான நலன்களை கோரவே இல்லை\nதிட்டங்களை உடனடியாக கண்டறிய உதவும் இலவச AI கருவி இல்லை.',
     speak: '🎤  பேசுங்கள்',
     upload: '📄  ஆவணம் பதிவேற்றவும்',
     find: '🔍  திட்டங்களை கண்டறியவும்',
@@ -87,7 +87,7 @@ export default function Home() {
         <div className="text-5xl mb-4">🏛️</div>
         <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900 mb-3">{t.title}</h1>
         <p className="text-sm md:text-base font-medium text-blue-700 mb-2">{t.aiLabel}</p>
-        <p className="text-base md:text-lg text-gray-700 mb-2 max-w-3xl mx-auto">{t.impact}</p>
+        <p className="text-base md:text-lg text-gray-700 mb-2 max-w-3xl mx-auto whitespace-pre-line">{t.impact}</p>
         <p className="text-lg text-gray-600 mb-10 max-w-xl mx-auto">{t.subtitle}</p>
 
         {/* Big action buttons */}
