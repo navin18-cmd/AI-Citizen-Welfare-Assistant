@@ -13,10 +13,12 @@ export default function UploadCard({ language, onResult }: Props) {
   const [loading, setLoading] = useState(false)
   const [ocrResult, setOcrResult] = useState<any>(null)
   const [extractedText, setExtractedText] = useState('')
+  const [invalidError, setInvalidError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleFile = (f: File) => {
     setFile(f)
+    setInvalidError(null)
     const reader = new FileReader()
     reader.onload = e => setPreview(e.target?.result as string)
     reader.readAsDataURL(f)
@@ -33,6 +35,7 @@ export default function UploadCard({ language, onResult }: Props) {
     setLoading(true)
     setOcrResult(null)
     setExtractedText('')
+    setInvalidError(null)
     const form = new FormData()
     form.append('file', file)
     form.append('document_type', docType)
@@ -40,6 +43,11 @@ export default function UploadCard({ language, onResult }: Props) {
     try {
       const res = await fetch('http://localhost:8000/upload-document', { method: 'POST', body: form })
       const data = await res.json()
+      if (data.verification_status === 'Invalid Document') {
+        setInvalidError(data.message || 'Invalid document. Please upload a valid Aadhaar card.')
+        setLoading(false)
+        return
+      }
       setOcrResult(data.parsed_data)
       setExtractedText(data.extracted_text || '')
       onResult(data)
@@ -125,7 +133,16 @@ export default function UploadCard({ language, onResult }: Props) {
         <p className="text-sm text-gray-500 text-center">Selected: {file.name}</p>
       )}
 
-      {/* OCR result preview */}
+      {/* Invalid document error banner */}
+      {invalidError && (
+        <div className="bg-red-50 border border-red-300 rounded-xl p-4 flex items-start gap-3">
+          <span className="text-2xl">❌</span>
+          <div>
+            <p className="text-sm font-semibold text-red-700">Invalid Document</p>
+            <p className="text-xs text-red-600 mt-1">{invalidError}</p>
+          </div>
+        </div>
+      )}
       {extractedText && (
         <div className="bg-blue-50 rounded-xl p-4">
           <p className="text-sm font-semibold text-blue-700 mb-2">📝 OCR Extracted Text</p>
