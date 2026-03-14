@@ -1,13 +1,15 @@
 """
 Schemes routes - list all schemes, check eligibility for a profile.
 """
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from typing import Optional
-import json, os
+import logging
 
 from services.scheme_engine import get_eligible_schemes, get_all_schemes
+from services.translation_service import translate, translate_scheme_fields
 
 router = APIRouter()
+LOGGER = logging.getLogger(__name__)
 
 
 @router.get("")
@@ -16,7 +18,8 @@ async def list_schemes(category: Optional[str] = None, language: str = "en"):
     schemes = get_all_schemes()
     if category:
         schemes = [s for s in schemes if s.get("category", "").lower() == category.lower()]
-    return {"schemes": schemes, "total": len(schemes)}
+    translated = [translate_scheme_fields(s, language) for s in schemes]
+    return {"schemes": translated, "total": len(translated)}
 
 
 @router.post("/check-eligibility")
@@ -25,18 +28,24 @@ async def check_eligibility(payload: dict):
     Accept citizen profile dict, return eligible schemes.
     Payload: { age, occupation, income, state, gender, bpl_card, has_land }
     """
-    eligible = get_eligible_schemes(payload)
-    total_benefit = sum(s["benefit_value"] for s in eligible)
-    score = _compute_score(eligible, payload)
+    language = payload.get("language", "en")
+    try:
+        eligible = get_eligible_schemes(payload)
+        translated = [translate_scheme_fields(s, language) for s in eligible]
+        total_benefit = sum(s.get("benefit_value", 0) for s in translated)
+        score = _compute_score(translated, payload)
 
-    return {
-        "eligible_schemes": eligible,
-        "total_schemes": len(eligible),
-        "total_benefit_value": total_benefit,
-        "eligibility_score": score,
-        "citizen_profile": payload,
-        "message": f"You qualify for {len(eligible)} government welfare schemes worth ₹{total_benefit:,.0f}"
-    }
+        return {
+            "eligible_schemes": translated,
+            "total_schemes": len(translated),
+            "total_benefit_value": total_benefit,
+            "eligibility_score": score,
+            "citizen_profile": payload,
+            "message": f"{translate('you_qualify', language, n=len(translated))} worth ₹{total_benefit:,.0f}",
+        }
+    except Exception as exc:
+        LOGGER.exception("Eligibility check failed")
+        raise HTTPException(status_code=500, detail=translate("validation_error", language)) from exc
 
 
 @router.get("/categories")

@@ -1,173 +1,258 @@
 # AI Citizen Welfare Assistant
 
-> Hackathon demo — FastAPI backend + Next.js 14 frontend + SQLite database.  
-> Fully offline-capable: every frontend page has `DEMO_*` fallback constants.
+Production-ready hackathon backend with real OCR parsing, multilingual profile extraction, dynamic scheme matching, translation fallbacks, and persistent workflow logging.
 
----
+## Project Overview
 
-## Quick Start
+This project helps citizens discover government welfare schemes using either voice/text details or uploaded documents.
 
-```bash
-# Backend (port 8000)
-cd backend
-pip install -r requirements.txt
-python main.py
+The frontend remains unchanged (Next.js 14), and the backend keeps the same API routes used by the UI:
+- `POST /voice-input`
+- `POST /voice-input/text`
+- `POST /upload-document`
+- `POST /schemes/check-eligibility`
+- `GET /schemes`, `GET /citizens`, `GET /citizens/ngo-dashboard`, etc.
 
-# Frontend (port 3000)
-cd frontend
-npm install
-npm run dev
-```
+## Upgraded Architecture
 
----
+### Backend Flow
+
+1. Voice/Text input reaches `routes/voice.py`.
+2. `services/speech_service.py` extracts structured profile fields in English/Hindi/Tamil.
+3. `services/scheme_engine.py` applies rule filtering and dynamic scoring.
+4. `services/translation_service.py` translates user-visible response fields (`hi`, `ta`) with English fallback.
+5. `utils/database.py` persists `voice_sessions`, recommended `applications`, and citizen records.
+
+### Document Flow
+
+1. Upload reaches `routes/documents.py`.
+2. `services/ocr_service.py` reads OCR text from image or first PDF page.
+3. Aadhaar keyword validation is applied before eligibility matching.
+4. Aadhaar parser extracts `name`, `dob`, `address`, `state`.
+5. Matched schemes are returned and persisted in `document_uploads` + `applications`.
+
+### Supported Document Types
+
+- `.jpg`
+- `.jpeg`
+- `.png`
+- `.pdf`
+
+Any other format is rejected with:
+- `Unsupported file format. Please upload Aadhaar image or PDF.`
+
+## AI / NLP Modules Used
+
+- `pytesseract` + `Pillow` + `pdf2image`
+  - OCR extraction from Aadhaar images and first page of Aadhaar PDFs.
+- Regex + keyword dictionaries
+  - Multilingual occupation/income/language extraction from natural text.
+- `deep-translator` (`GoogleTranslator`)
+  - Runtime translation for scheme names, descriptions, reasons, and response messages.
+- Rule-based scheme engine
+  - Step 1: strict rule filtering (`income`, `occupation`, `state`, `age`, `gender`).
+  - Step 2: dynamic eligibility scoring in range `60-95`.
+  - Step 3: human-readable eligibility reason + benefit summary.
 
 ## Project Structure
 
-```
+```text
 ai-welfare-assistant/
-├── backend/
-│   ├── main.py                         # FastAPI app entry — CORS, static mounts, router wiring, DB init
-│   ├── requirements.txt                # fastapi, uvicorn, python-multipart, pydantic, aiofiles, Pillow
-│   ├── models/
-│   │   └── citizen.py                  # Pydantic: CitizenBase, CitizenCreate, CitizenResponse, EligibilityRequest
-│   ├── routes/
-│   │   ├── citizens.py                 # GET/POST /citizens, GET /citizens/ngo-dashboard, GET /citizens/{id}
-│   │   ├── schemes.py                  # GET/POST /schemes, POST /schemes/check-eligibility
-│   │   ├── voice.py                    # POST /voice-input (audio or text), POST /voice-input/text
-│   │   └── documents.py                # POST /upload-document (file → mock OCR → schemes)
-│   ├── services/
-│   │   ├── scheme_engine.py            # Core eligibility matching: income→age→occupation→state→gender scoring
-│   │   ├── speech_service.py           # Mock Whisper transcription + NLP field extraction (regex-based)
-│   │   ├── ocr_service.py              # Mock Tesseract OCR — fixed demo Aadhaar/income-cert outputs
-│   │   └── translation_service.py      # Static EN/HI/TA string map
-│   └── utils/
-│       ├── database.py                 # SQLite init + scheme/citizen seeding
-│       └── helpers.py                  # parse_income/occupation/age/state_from_text regex parsers
-│
-├── frontend/
-│   └── src/
-│       ├── app/
-│       │   ├── page.tsx                # Landing — hero, language selector, action buttons, inline stats
-│       │   ├── voice/page.tsx          # Wraps VoiceRecorder → saves result to sessionStorage → /results
-│       │   ├── upload/page.tsx         # Document upload flow
-│       │   ├── results/page.tsx        # Reads sessionStorage or ?demo=true → renders SchemeCard list
-│       │   └── dashboard/page.tsx      # NGO stats + CitizenTable — falls back to DEMO_DASHBOARD
-│       └── components/
-│           ├── ChatAssistant.tsx        # Floating FAQ chatbot — offline-capable
-│           ├── EligibilityScore.tsx     # AI Eligibility Score ring + confidence badge (mock values)
-│           ├── VoiceRecorder.tsx        # Mic input + demo-text fallback
-│           ├── SchemeCard.tsx           # Single scheme result card
-│           ├── CitizenTable.tsx         # NGO dashboard table
-│           ├── LanguageSelector.tsx     # EN / HI / TA switcher
-│           └── UploadCard.tsx           # Document upload UI
-│
-├── datasets/
-│   ├── schemes.json                    # 7 real schemes: Ayushman Bharat, e-Shram, PM-SYM, PMAY-G, PM Kisan, Ujjwala, MGNREGS
-│   └── citizens_demo.json              # 3 seeded demo citizens
-│
-├── database/
-│   └── schema.sql                      # 5 tables: citizens, schemes, applications, voice_sessions, document_uploads
-│
-└── ai_modules/                         # Empty — placeholder for real ML modules
+|- backend/
+|  |- main.py
+|  |- requirements.txt
+|  |- routes/
+|  |  |- voice.py
+|  |  |- documents.py
+|  |  |- schemes.py
+|  |  |- citizens.py
+|  |- services/
+|  |  |- speech_service.py
+|  |  |- ocr_service.py
+|  |  |- scheme_engine.py
+|  |  |- translation_service.py
+|  |- utils/
+|  |  |- database.py
+|  |  |- helpers.py
+|- frontend/
+|  |- src/
+|     |- app/
+|     |- components/
+|     |- services/api.ts
+|- datasets/
+|  |- schemes.json
+|  |- citizens_demo.json
+|- database/
+|  |- schema.sql
 ```
 
----
+## Database Usage
 
-## API Endpoints
+All schema tables are now actively used:
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/` | API info + endpoint map |
-| `GET` | `/health` | Health check |
-| `POST` | `/voice-input` | Audio file or text → extracted profile + eligible schemes |
-| `POST` | `/voice-input/text` | JSON text shortcut for voice |
-| `POST` | `/upload-document` | File upload → mock OCR → matched schemes |
-| `GET` | `/schemes` | List all schemes |
-| `POST` | `/schemes` | Add scheme |
-| `POST` | `/schemes/check-eligibility` | Check eligibility against criteria |
-| `GET` | `/citizens` | List all citizens |
-| `POST` | `/citizens` | Register citizen |
-| `GET` | `/citizens/ngo-dashboard` | Aggregated NGO stats |
-| `GET` | `/citizens/{id}` | Single citizen detail |
+- `citizens`
+  - Stores citizen records from voice/document extraction.
+- `voice_sessions`
+  - Stores transcript, extracted profile JSON, language, and citizen link.
+- `document_uploads`
+  - Stores file metadata, OCR text, parsed data, and citizen link.
+- `applications`
+  - Stores generated scheme recommendations per citizen with score and notes.
+- `schemes`
+  - Seeded from `datasets/schemes.json`.
 
-Interactive docs: **http://localhost:8000/docs**
+## Installation
 
----
+### 1. Backend Setup
 
-## Data Flow
+```powershell
+cd "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\backend"
 
-```
-User speaks / uploads doc
-        │
-        ▼
-  speech_service.py          ocr_service.py
-  (mock Whisper +            (mock Tesseract —
-   regex NLP extract)         fixed demo output)
-        │                           │
-        └──────────┬────────────────┘
-                   ▼
-          scheme_engine.py
-          (income → age → occupation
-           → state → gender scoring)
-                   │
-                   ▼
-          Matched schemes JSON
-                   │
-                   ▼
-          frontend /results page
-          (SchemeCard list)
+# if needed, activate your venv first
+# .\\..\\.venv\\Scripts\\Activate.ps1
+
+pip install -r requirements.txt
+
+# direct install for OCR stack (equivalent)
+pip install pytesseract pdf2image pillow
 ```
 
----
+### 2. OCR Dependencies (Windows)
 
-## Key Design Decisions
+`pytesseract` requires the Tesseract executable installed on your system.
 
-| Decision | Detail |
-|----------|--------|
-| **No real ML at runtime** | `speech_service` and `ocr_service` are mocks — no Whisper/pytesseract dependency. Safe to run offline. |
-| **Frontend offline fallback** | Every page/component has a `DEMO_*` constant — frontend runs fully without the backend. |
-| **SQLite** | Zero-config DB. Seeded on startup via `init_db()` in `utils/database.py`. |
-| **Scoring** | `_compute_score` in `routes/schemes.py` and `eligibility_score` in `services/scheme_engine.py` are independent — results may diverge. |
-| **Language** | `language` param accepted in voice routes but `extract_info_from_text` always parses as English (regex only). |
+1. Install Tesseract OCR (Windows installer).
+2. Ensure `tesseract.exe` is available in `PATH`.
+3. Verify:
 
----
+```powershell
+tesseract --version
+```
 
-## Recent UI Updates
+If it is not in PATH, set `pytesseract.pytesseract.tesseract_cmd` in `ocr_service.py` to the local executable path.
 
-- Homepage CTA buttons clarified to: `🎤 Speak Your Details`, `📄 Upload Aadhaar`, `🔍 Find Eligible Schemes`.
-- Updated homepage hero line under the title to: `Discover. Register. Receive — find every government scheme you qualify for, free, instantly.`
-- Added impact statement on homepage hero: `Helping 500M+ informal workers discover government welfare schemes instantly.`
-- Added footer note on homepage: `Demo Mode — using simulated welfare scheme data.`
-- No backend/API behavior changes and no new dependencies required.
+`pdf2image` requires Poppler for PDF conversion.
 
----
+Install Poppler and set one of the following:
+1. Add Poppler `bin` folder to `PATH`.
+2. Or set environment variable `POPPLER_PATH` to Poppler `bin` directory.
 
-## Known Gaps (for future LLMs / contributors)
+Example (PowerShell):
 
-| Area | Status |
-|------|--------|
-| `ai_modules/` | Empty — placeholder for real ML |
-| `frontend/src/types/` | Empty — no shared TypeScript types |
-| Pydantic models in routes | `citizen.py` models defined but routes accept raw `dict` |
-| `applications` table | Schema exists, no route creates/reads applications |
-| `voice_sessions` / `document_uploads` tables | Schema exists, but routes don't persist records to DB |
-| Multi-language NLP | `language` param wired but regex parser is English-only |
-| AI Eligibility Score | Uses hardcoded mock values (87%, High confidence) — wire to real scoring engine when available |
+```powershell
+$env:POPPLER_PATH = "C:\poppler\Library\bin"
+```
 
----
+### 3. Frontend Setup
 
-## Tech Stack
+```powershell
+cd "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\frontend"
+npm install
+```
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | Python 3.11+, FastAPI, Uvicorn, SQLite |
-| Frontend | Next.js 14, TypeScript, Tailwind CSS |
-| OCR (mock) | Pillow (placeholder for Tesseract) |
-| Speech (mock) | Placeholder for OpenAI Whisper |
-| Translation | Static string map (placeholder for Google Translate API) |
+## How To Run
 
-## To start the web
-Backend:cd "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\backend"
+### Run Backend (port 8000)
+
+```powershell
+cd "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\backend"
 & "C:\Users\NAVIN GS\OneDrive\project\public welfare demo\.venv\Scripts\python.exe" -m uvicorn main:app --reload
-Frontend:cd "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\frontend"
+```
+
+Backend docs:
+- `http://localhost:8000/docs`
+
+### Run Frontend (port 3000)
+
+```powershell
+cd "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\frontend"
 npm.cmd run dev
+```
+
+Frontend:
+- `http://localhost:3000`
+
+## API Compatibility Notes
+
+The backend upgrade preserves all existing frontend-consumed route paths and response keys such as:
+- `transcript`
+- `extracted_profile`
+- `eligible_schemes`
+- `total_schemes`
+- `total_benefit_value`
+- `message`
+
+New metadata fields were added in responses (for traceability) without breaking existing keys:
+- `citizen_id`
+- `voice_session_id`
+- `document_upload_id`
+- `applications_saved`
+
+## Demo Workflow
+
+### Voice/Text Demo
+
+1. Open `/voice` in frontend.
+2. Speak or type a sentence in English, Hindi, or Tamil.
+3. Backend extracts:
+   - `occupation`
+   - `income` (monthly)
+   - `language`
+   - optional profile hints (`state`, `age`, etc.)
+4. Eligible schemes appear with:
+   - `scheme_name`
+   - `eligibility_score` (`60-95`)
+   - `reason`
+   - `required_documents`
+   - `benefit_summary`
+
+Example Tamil input:
+- `நான் விவசாயி மாதம் 8000 சம்பாதிக்கிறேன்`
+- Parsed as: `occupation=farmer`, `income=8000`, `language=ta`
+
+### Document Upload Demo
+
+1. Open `/upload` in frontend.
+2. Upload a clear Aadhaar image (`.jpg/.jpeg/.png`) or Aadhaar PDF (`.pdf`).
+3. OCR extracts text using:
+  - direct image OCR for image files
+  - `pdf2image` first-page conversion + OCR for PDF files
+4. Aadhaar verification checks text for keywords such as `aadhaar`, `government of india`, `uidai`.
+5. On success:
+  - `verification_status` is `Aadhaar Verified`
+  - extracted `name`, `dob`, `state`, `address` are returned
+6. On failure:
+  - `verification_status` is `Invalid Document`
+  - message: `Invalid document. Please upload a valid Aadhaar card.`
+
+## Error Handling and Validation
+
+Implemented in upgraded backend:
+- strict file type validation (`.jpg/.jpeg/.png/.pdf` only)
+- unreadable image handling (`400` responses with actionable message)
+- unreadable/corrupted PDF handling (`400` responses)
+- empty OCR result handling
+- OCR failure handling with safe response
+- empty text/audio validation in voice routes
+- parser fallback behavior for partial profiles
+- translation fallback to English on network/API errors
+- structured logging for OCR, translation, and voice failures
+
+## Required Libraries
+
+Backend `requirements.txt` includes:
+- `fastapi`
+- `uvicorn[standard]`
+- `python-multipart`
+- `pydantic`
+- `aiofiles`
+- `Pillow`
+- `pytesseract`
+- `pdf2image`
+- `deep-translator`
+
+## Notes
+
+- The frontend still contains local demo fallback constants for offline UX safety.
+- Audio transcription remains a placeholder message unless a full ASR model (Whisper/local STT) is integrated.
+- Text-based multilingual extraction and scheme matching are fully functional.
