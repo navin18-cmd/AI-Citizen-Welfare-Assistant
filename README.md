@@ -152,6 +152,24 @@ npm install
 
 ## How To Run
 
+### Run with Windows CMD (Command Prompt)
+
+Open two separate CMD windows.
+
+CMD Window 1 (Backend):
+
+```cmd
+cd /d "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\backend"
+"c:\Users\NAVIN GS\OneDrive\project\public welfare demo\.venv\Scripts\python.exe" -m uvicorn main:app --reload
+```
+
+CMD Window 2 (Frontend):
+
+```cmd
+cd /d "c:\Users\NAVIN GS\OneDrive\project\public welfare demo\ai-welfare-assistant\frontend"
+npm run dev
+```
+
 ### Run Backend (port 8000)
 
 ```powershell
