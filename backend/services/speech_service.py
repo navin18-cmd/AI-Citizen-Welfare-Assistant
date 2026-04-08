@@ -2,11 +2,13 @@
 
 import logging
 import re
+import os
 from typing import Dict, Optional
 
 from utils.helpers import parse_age_from_text, parse_state_from_text
 
 LOGGER = logging.getLogger(__name__)
+USE_DEMO_MODE = os.getenv("USE_DEMO_MODE", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 _OCCUPATION_KEYWORDS = {
     "farmer": [
@@ -103,6 +105,9 @@ def transcribe_audio(audio_bytes: bytes, language: str = "en") -> str:
     """
     if not audio_bytes:
         raise ValueError("Empty audio payload")
+
+    if not USE_DEMO_MODE:
+        raise RuntimeError("Demo audio transcription is disabled")
 
     LOGGER.warning(
         "Audio transcription model is not configured. Returning placeholder transcript for language=%s",

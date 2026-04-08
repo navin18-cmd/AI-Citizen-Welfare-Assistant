@@ -1,5 +1,6 @@
 'use client'
 import { useState, useRef } from 'react'
+import { api } from '@/services/api'
 
 interface Props {
   language: string
@@ -25,29 +26,42 @@ export default function VoiceRecorder({ language, onResult }: Props) {
   const [transcript, setTranscript] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [transcriptionReady, setTranscriptionReady] = useState(false)
   const mediaRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
+  const mimeTypeRef = useRef<string>('audio/webm')
   const streamRef = useRef<MediaStream | null>(null)
+  const autoStopTimerRef = useRef<number | null>(null)
 
   const startRecording = async () => {
     setError('')
+    setTranscriptionReady(false)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
       const recorder = new MediaRecorder(stream)
+      mimeTypeRef.current = recorder.mimeType || 'audio/webm'
       chunksRef.current = []
       recorder.ondataavailable = e => chunksRef.current.push(e.data)
       recorder.onstop = handleStop
       mediaRef.current = recorder
       recorder.start()
+      autoStopTimerRef.current = window.setTimeout(() => {
+        if (mediaRef.current?.state === 'recording') {
+          stopRecording()
+        }
+      }, 10000)
       setIsRecording(true)
     } catch {
-      setError('Microphone not available. Using demo text instead.')
-      useDemoText()
+      setError('Microphone not available. Please type your details manually.')
     }
   }
 
   const stopRecording = () => {
+    if (autoStopTimerRef.current) {
+      window.clearTimeout(autoStopTimerRef.current)
+      autoStopTimerRef.current = null
+    }
     mediaRef.current?.stop()
     streamRef.current?.getTracks().forEach(t => t.stop())
     setIsRecording(false)
@@ -55,18 +69,16 @@ export default function VoiceRecorder({ language, onResult }: Props) {
 
   const handleStop = async () => {
     setLoading(true)
-    const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
-    const form = new FormData()
-    form.append('audio', blob, 'recording.webm')
-    form.append('language', language)
+    setError('')
+    setTranscriptionReady(false)
+    const blob = new Blob(chunksRef.current, { type: mimeTypeRef.current || 'audio/webm' })
     try {
-      const res = await fetch('http://localhost:8000/voice-input', { method: 'POST', body: form })
-      const data = await res.json()
+      const data = await api.sendAudio(blob, language)
       setTranscript(data.transcript || '')
-      onResult(data)
-    } catch {
-      // Backend not available — run demo flow
-      useDemoText()
+      setTranscriptionReady(true)
+    } catch (err: any) {
+      const detail = typeof err?.message === 'string' ? err.message : 'Transcription failed. Please try again or type your details.'
+      setError(detail)
     } finally {
       setLoading(false)
     }
@@ -101,6 +113,8 @@ export default function VoiceRecorder({ language, onResult }: Props) {
 
   const handleTextSubmit = async () => {
     if (!transcript.trim()) return
+    setError('')
+    setTranscriptionReady(false)
     setLoading(true)
     try {
       const res = await fetch('http://localhost:8000/voice-input/text', {
@@ -146,13 +160,19 @@ export default function VoiceRecorder({ language, onResult }: Props) {
         <p className="font-semibold text-gray-700">
           {isRecording ? (
             <span className="text-red-600">
-              <span className="recording-dot">●</span> Recording... tap to stop
+              <span className="recording-dot">●</span> Listening... tap to stop
             </span>
-          ) : loading ? '⏳ Analyzing your profile with AI...' : 'Tap to speak'}
+          ) : loading ? 'Processing...' : 'Tap to speak'}
         </p>
       </div>
 
       {error && <p className="text-sm text-orange-600 text-center">{error}</p>}
+
+      {transcriptionReady && !loading && (
+        <p className="text-sm text-green-700 text-center">
+          Voice converted to text. Review/edit and click Find My Schemes.
+        </p>
+      )}
 
       {/* Or type */}
       <div>

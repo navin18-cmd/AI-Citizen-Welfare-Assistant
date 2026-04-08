@@ -7,7 +7,16 @@ const BASE = 'http://localhost:8000'
 
 async function safeFetch(url: string, options?: RequestInit) {
   const res = await fetch(url, options)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  if (!res.ok) {
+    let detail = `HTTP ${res.status}`
+    try {
+      const errorData = await res.json()
+      detail = errorData?.detail || errorData?.message || detail
+    } catch {
+      // Keep default detail when response body is not JSON.
+    }
+    throw new Error(detail)
+  }
   return res.json()
 }
 
@@ -22,9 +31,17 @@ export const api = {
 
   sendAudio: (audioBlob: Blob, language = 'en') => {
     const form = new FormData()
-    form.append('audio', audioBlob, 'recording.webm')
+    const mimeType = audioBlob.type || 'audio/webm'
+    const ext = mimeType.includes('ogg')
+      ? 'ogg'
+      : mimeType.includes('mp4')
+        ? 'mp4'
+        : mimeType.includes('mpeg')
+          ? 'mp3'
+          : 'webm'
+    form.append('audio', audioBlob, `recording.${ext}`)
     form.append('language', language)
-    return safeFetch(`${BASE}/voice-input`, { method: 'POST', body: form })
+    return safeFetch(`${BASE}/voice-input/audio`, { method: 'POST', body: form })
   },
 
   // Document upload
